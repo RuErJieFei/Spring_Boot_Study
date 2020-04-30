@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soft1851.springboot.mbp.mapper.SysPermissionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.soft1851.springboot.mbp.entity.SysPermission">
+        <id column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="type" property="type"/>
+        <result column="name" property="name"/>
+        <result column="icon" property="icon"/>
+        <result column="path" property="path"/>
+        <result column="ex1" property="ex1"/>
+        <result column="ex2" property="ex2"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, parent_id, type, name, icon, path, ex1, ex2
+    </sql>
+
+
+    <!--    <resultMap id="permissionMap" type="com.soft1851.springboot.mbp.entity.SysPermission">-->
+    <!--        <id column="id" property="id"/>-->
+    <!--        <result column="type" property="type"/>-->
+    <!--        <result column="path" property="path"/>-->
+    <!--        <collection property="roles" ofType="com.soft1851.springboot.mbp.entity.SysRole">-->
+    <!--            <id column="role_id" property="roleId"/>-->
+    <!--            <result column="role_name" property="roleName"/>-->
+    <!--        </collection>-->
+    <!--    </resultMap>-->
+
+    <!--    <resultMap id="roleMap" type="com.soft1851.springboot.mbp.entity.SysUser">-->
+    <!--        <id column="role_id" property="roleId"/>-->
+    <!--        <result column="role_name" property="roleName"/>-->
+    <!--        <collection property="users" ofType="com.soft1851.springboot.mbp.entity.SysUser">-->
+    <!--            <id column="user_id" property="userId"/>-->
+    <!--            <result column="user_name" property="userName"/>-->
+    <!--        </collection>-->
+    <!--    </resultMap>-->
+
+    <resultMap id="userMap" type="com.soft1851.springboot.mbp.entity.SysUser">
+        <id column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <collection property="roles" ofType="com.soft1851.springboot.mbp.entity.SysRole">
+            <id column="role_id" property="roleId"/>
+            <result column="role_name" property="roleName"/>
+        </collection>
+        <collection property="permissions" ofType="com.soft1851.springboot.mbp.entity.SysPermission">
+            <id column="id" property="id"/>
+            <result column="type" property="type"/>
+            <result column="path" property="path"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="getPermissionByUserId" resultMap="userMap">
+        SELECT su.user_id,
+               su.user_name,
+               sr.role_id,
+               sr.role_name,
+               sp.id AS permission_id,
+               sp.type,
+               sp.path
+        FROM sys_user su,
+             user_role ur,
+             sys_role sr,
+             role_permission rp,
+             sys_permission sp
+        WHERE su.user_id = #{userId}
+          AND su.user_id = ur.user_id
+          AND ur.role_id = sr.role_id
+          AND sr.role_id = rp.role_id
+          AND rp.permission_id = sp.id
+    </select>
+
+</mapper>
